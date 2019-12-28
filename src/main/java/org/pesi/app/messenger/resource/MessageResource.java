@@ -12,7 +12,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 
 import org.pesi.app.messenger.model.Message;
 import org.pesi.app.messenger.service.MessageService;
@@ -65,4 +68,24 @@ public class MessageResource {
 	public void deleteMessage(@PathParam("messageId") long messageId) {
 		mService.removeMessage(messageId);
 	}
+
+	/*
+	 * Alternate method to get parameters.
+	 * 
+	 * @Context is a special annotation that can only be appplied on specific jax-rs
+	 * classes. Provides a way to access parameters. 
+	 * A third way is to create a bean that has the query param as members, then use that bean in place of the params 
+	 *  using the @BeanParam annotation. The params will be accessible using the getters in the bean.
+	 */
+
+	@GET
+	@Path("/context")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String getParamsUsingContext(@Context UriInfo uriInfo, @Context HttpHeaders headers) {
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("Path: ").append(uriInfo.getPath()).append("\nBase URI ").append(uriInfo.getBaseUri());
+		stringBuilder.append("\nCookies: ").append(headers.getCookies());
+		return stringBuilder.toString();
+	}
+
 }
