@@ -1,5 +1,7 @@
 package org.pesi.app.messenger.resource;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Calendar;
 import java.util.List;
 
@@ -15,6 +17,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.pesi.app.messenger.model.Message;
@@ -32,7 +35,7 @@ public class MessageResource {
 		if (year > 0) {
 			return mService.getMessagesForYear(year);
 		}
-		if (start >= 0 && size >= 0) {
+		if (start >= 0 && size > 0) {
 			return mService.getAllMessagesPaginated(start, size);
 		}
 		return mService.getAllMessages();
@@ -48,9 +51,14 @@ public class MessageResource {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Message addMessage(Message message) {
+	public Response addMessage(@Context UriInfo uriInfo, Message message) throws URISyntaxException {
 		message.setCreated(Calendar.getInstance().getTime());
-		return mService.addMessage(message);
+		Message newMessage = mService.addMessage(message);
+		String newMessageId = String.valueOf(newMessage.getId()); 
+		URI uri = uriInfo.getAbsolutePathBuilder().path(newMessageId).build();
+		return Response.created(uri)
+				.entity(newMessage)
+				.build();
 	}
 
 	@PUT
@@ -73,9 +81,10 @@ public class MessageResource {
 	 * Alternate method to get parameters.
 	 * 
 	 * @Context is a special annotation that can only be appplied on specific jax-rs
-	 * classes. Provides a way to access parameters. 
-	 * A third way is to create a bean that has the query param as members, then use that bean in place of the params 
-	 *  using the @BeanParam annotation. The params will be accessible using the getters in the bean.
+	 * classes. Provides a way to access parameters. A third way is to create a bean
+	 * that has the query param as members, then use that bean in place of the
+	 * params using the @BeanParam annotation. The params will be accessible using
+	 * the getters in the bean.
 	 */
 
 	@GET
@@ -87,11 +96,13 @@ public class MessageResource {
 		stringBuilder.append("\nCookies: ").append(headers.getCookies());
 		return stringBuilder.toString();
 	}
-	
-	/*To separate resource handling, I can delegate processing to a
-	 *  resource handler for sub resources (comments on messages).
-	 *  Here, all HTTPS methods accessed for this path will be redirected to be
-	 *  processed by the CommentResource*/
+
+	/*
+	 * To separate resource handling, I can delegate processing to a resource
+	 * handler for sub resources (comments on messages). Here, all HTTPS methods
+	 * accessed for this path will be redirected to be processed by the
+	 * CommentResource
+	 */
 	@Path("/{messageId}/comments")
 	public CommentResource getCommentResource() {
 		return new CommentResource();
