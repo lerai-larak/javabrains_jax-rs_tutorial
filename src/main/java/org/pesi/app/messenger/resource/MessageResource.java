@@ -87,5 +87,14 @@ public class MessageResource {
 		stringBuilder.append("\nCookies: ").append(headers.getCookies());
 		return stringBuilder.toString();
 	}
+	
+	/*To separate resource handling, I can delegate processing to a
+	 *  resource handler for sub resources (comments on messages).
+	 *  Here, all HTTPS methods accessed for this path will be redirected to be
+	 *  processed by the CommentResource*/
+	@Path("/{messageId}/comments")
+	public CommentResource getCommentResource() {
+		return new CommentResource();
+	}
 
 }
