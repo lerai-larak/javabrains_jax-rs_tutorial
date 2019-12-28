@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.pesi.app.messenger.database.DatabaseClass;
+import org.pesi.app.messenger.exception.DataNotFoundException;
 import org.pesi.app.messenger.model.Message;
 
 public class MessageService {
@@ -40,7 +41,11 @@ public class MessageService {
 	}
 	
 	public Message getMessage(long id) {
-		return messages.get(id);
+		Message message = messages.get(id);
+		if (message == null ) {
+			throw new DataNotFoundException("Message with Id " + id +" not found");
+		}
+		return message;
 	}
 	
 	public Message addMessage(Message message) {
