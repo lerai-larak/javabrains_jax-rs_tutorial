@@ -44,8 +44,27 @@ public class MessageResource {
 	@GET
 	@Path("/{messageId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Message getMessageWithId(@PathParam("messageId") long messageId) {
-		return mService.getMessage(messageId);
+	public Message getMessageWithId(@PathParam("messageId") long messageId, @Context UriInfo uriInfo) {
+		Message message = mService.getMessage(messageId);
+		message.addLink(getUriForSelf(uriInfo, message), "self");
+		message.addLink(getUriForProfile(uriInfo, message), "profile");
+		return message;
+	}
+
+	private String getUriForProfile(UriInfo uriInfo, Message message) {
+		URI uri = uriInfo.getBaseUriBuilder()
+				.path(ProfileResource.class)
+				.path(message.getAuthor())
+				.build();
+		return uri.toString();
+	}
+
+	private String getUriForSelf(UriInfo uriInfo, Message message) {
+		String url = uriInfo.getBaseUriBuilder()
+				.path(MessageResource.class)
+				.path(Long.toString(message.getId()))
+				.build().toString();
+		return url;
 	}
 
 	@POST

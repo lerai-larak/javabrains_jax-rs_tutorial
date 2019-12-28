@@ -7,7 +7,7 @@ import javax.ws.rs.ext.Provider;
 
 import org.pesi.app.messenger.model.ErrorMessage;
 
-@Provider
+//@Provider //disabled the catch-all mapper.
 public class GenericExceptionMapper implements ExceptionMapper<Exception>{
 
 	@Override
