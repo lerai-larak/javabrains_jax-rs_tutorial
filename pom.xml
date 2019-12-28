@@ -49,9 +49,11 @@
 			<groupId>org.glassfish.jersey.inject</groupId>
 			<artifactId>jersey-hk2</artifactId>
 		</dependency>
-		<!-- uncomment this to get JSON support <dependency> <groupId>org.glassfish.jersey.media</groupId> 
-			<artifactId>jersey-media-json-binding</artifactId> </dependency> -->
-		
+		<dependency>
+			<groupId>org.glassfish.jersey.media</groupId>
+			<artifactId>jersey-media-json-binding</artifactId>
+		</dependency>
+
 		<!-- Had to re-add these javax.xml.bind dependencies as they are removed 
 			in Java 9 and newer -->
 		<dependency>
